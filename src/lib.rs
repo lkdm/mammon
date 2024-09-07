@@ -1,5 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-use core::ops::{Add, Div, Mul, Rem, Sub};
+use core::ops::{Add, Div, Mul, Rem, Sub, Deref};
 use num_traits::{FromPrimitive, PrimInt, ToPrimitive};
 
 trait MoneyOps<T> {
@@ -8,6 +8,14 @@ trait MoneyOps<T> {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 struct Cent<T: PrimInt + FromPrimitive + ToPrimitive>(T);
+
+impl<T: PrimInt + FromPrimitive + ToPrimitive> Deref for Cent<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl<T: PrimInt + FromPrimitive> From<f32> for Cent<T> {
     fn from(f: f32) -> Self {
