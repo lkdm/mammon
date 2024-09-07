@@ -3,6 +3,10 @@ name = "mammon"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["std"]
+std = []
+
 [dependencies.num-traits]
 version = "0.2.19"
 default-features = false

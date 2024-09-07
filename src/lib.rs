@@ -1,3 +1,4 @@
+#![cfg_attr(not(feature = "std"), no_std)]
 use core::ops::{Add, Div, Mul, Rem, Sub};
 use num_traits::{FromPrimitive, PrimInt, ToPrimitive};
 
@@ -48,6 +49,9 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Money<T> {
     pub fn new(value: T) -> Self {
         Money(value)
     }
+    fn div_round_up(a: T, b: T) -> T {
+        (a + b - T::one()) / b
+    }
 }
 
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Add for Money<T> {
@@ -67,15 +71,18 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Sub for Money<T> {
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Mul for Money<T> {
     type Output = Self;
     fn mul(self, rhs: Self) -> Self::Output {
-        Money((self.0 * rhs.0) >> 6)
+        let hundred = T::from_u8(100).unwrap();
+        let result = Self::div_round_up(self.0 * rhs.0, hundred);
+        Money(result)
     }
 }
 
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Div for Money<T> {
     type Output = Self;
     fn div(self, rhs: Self) -> Self::Output {
-        let numerator = (self.0 << 6) + (self.0 << 5) + (self.0 << 2);
-        Money(numerator / rhs.0)
+        let hundred = T::from_u8(100).unwrap();
+        let result = Self::div_round_up(self.0 * hundred, rhs.0);
+        Money(result)
     }
 }
 
@@ -99,16 +106,17 @@ pub type Moneyu32 = Money<u32>;
 pub type Moneyu16 = Money<u16>;
 pub type Moneyu8 = Money<u8>;
 
+#[cfg(test)]
 mod tests {
     use super::*;
-    #[cfg(test)]
+    #[test]
     fn test_money() {
         let m1 = Moneyi32::new(123);
         let m2 = Moneyi32::new(456);
-        assert_eq!(m1 + m2, Money(679));
+        assert_eq!(m1 + m2, Money(579));
         assert_eq!(m1 - m2, Money(-333));
-        assert_eq!(m1 * m2, Money(56));
-        assert_eq!(m1 / m2, Money(26));
+        assert_eq!(m1 * m2, Money(561));
+        assert_eq!(m1 / m2, Money(27));
         assert_eq!(m1 % m2, Money(123));
     }
 }
