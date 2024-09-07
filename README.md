@@ -1,12 +1,11 @@
 # mammon
-Rust lib crate for ergonomically working with money values.
 
-Currently work in progress.
+Rust library for ergonomically working with money as standard integer values.
 
 ## Usage
 
 ```rust
-let money = Money::from("$2.50".to_string());
-let money2 = Money::from("$20.05".to_string());
-println!("{}", money * money2); // $50.12
+let money = Centu32::new(1230); // 12.30
+let rate = Centu32::new(5); // 0.05
+println!("{}", money * money2); // $0.62
 ```
