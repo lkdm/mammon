@@ -7,7 +7,7 @@ use num_traits::{FromPrimitive, PrimInt, ToPrimitive};
 /// A Mill is a fixed-point number with 64 bits of precision and a scale of 1,000.
 /// (2^64/2-1)/1000 = 9,223,372,036,854,775.807
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct Mills<T: PrimInt + FromPrimitive + ToPrimitive>(T);
+pub struct Mills<T: PrimInt + FromPrimitive + ToPrimitive>(T);
 
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Deref for Mills<T> {
     type Target = T;
