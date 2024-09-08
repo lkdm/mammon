@@ -1,5 +1,5 @@
 [package]
-name = "mammon"
+name = "mammon_newtype"
 description = "An ergonomic, no_std, fixed-point arithmetic library for financial applications."
 version = "0.1.0"
 edition = "2021"

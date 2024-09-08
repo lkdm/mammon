@@ -1,4 +1,4 @@
-# mammon
+# mammon_newtype
 
 Mammon is a lightweight, opinionated crate for working with money in Rust.
 
