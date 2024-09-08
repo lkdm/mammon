@@ -1,6 +1,10 @@
 # mammon
 
-Rust library for ergonomically working with money as standard integer values.
+Mammon is a lightweight, opinionated crate for working with money in Rust.
+
+It provides a newtype wrapper around integer primitives that represent a number at three decimal places.
+
+This is useful for working with currencies that have a fixed number of decimal places, such as the US dollar.
 
 ## Features
 
