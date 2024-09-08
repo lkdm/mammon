@@ -1,7 +1,7 @@
 [package]
 name = "mammon_newtype"
 description = "An ergonomic, no_std, fixed-point arithmetic library for financial applications."
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 readme = "README.md"
 repository = "https://github.com/lkdm/mammon"
