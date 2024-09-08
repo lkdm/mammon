@@ -1,5 +1,5 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-use core::ops::{Add, Div, Mul, Rem, Sub, Deref};
+use core::ops::{Add, Deref, Div, Mul, Rem, Sub};
 use num_traits::{FromPrimitive, PrimInt, ToPrimitive};
 
 /// Mills
@@ -38,12 +38,22 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Mills<T> {
     pub fn new(value: T) -> Self {
         Mills(value)
     }
+
+    /// # From Cents
+    /// Creates a new Mill from a value in cents
+    ///
+    /// Some APIs send values in cents, this function can be used to convert them to Mills.
+    pub fn from_cents(cents: T) -> Self {
+        Mills(cents * T::from_u16(10).unwrap())
+    }
     fn round_bankers(value: T) -> T {
         let precision = T::from_u16(1_000).unwrap();
         let half = T::from_u16(500).unwrap();
         let remainder = value % precision;
 
-        if remainder > half || (remainder == half && (value / precision) % T::from_u8(2).unwrap() == T::one()) {
+        if remainder > half
+            || (remainder == half && (value / precision) % T::from_u8(2).unwrap() == T::one())
+        {
             value + precision - remainder
         } else {
             value - remainder
@@ -125,5 +135,11 @@ mod tests {
         assert_eq!(m1 * n1.into(), Milli64::new(561));
         assert_eq!(m1 / n1.into(), Milli64::new(27));
         assert_eq!(m1 % n1.into(), Milli64::new(123));
+    }
+
+    #[test]
+    fn test_from_cents() {
+        let m1 = Milli64::from_cents(123);
+        assert_eq!(m1, Milli64::new(1_230));
     }
 }
