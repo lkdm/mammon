@@ -1,7 +1,11 @@
 [package]
 name = "mammon"
+description = "A library for working with money using integers."
 version = "0.1.0"
 edition = "2021"
+readme = "README.md"
+repository = "https://github.com/lkdm/mammon"
+categories = ["finance", "no-std"]
 
 [features]
 default = ["std"]
