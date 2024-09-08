@@ -8,7 +8,7 @@ This is useful for working with currencies that have a fixed number of decimal p
 
 ## Features
 
-- Newtype wrapper around all integer primtives for representing a number at three decimal places.
+- Newtype wrapper around integer primitives for representing a number at three decimal places.
 - Arithmetic operations between values.
 - No standard library dependencies.
 
