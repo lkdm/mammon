@@ -2,7 +2,7 @@
 use core::ops::{Add, Div, Mul, Rem, Sub, Deref};
 use num_traits::{FromPrimitive, PrimInt, ToPrimitive};
 
-/// Mill
+/// Mills
 ///
 /// A Mill is a fixed-point number with 64 bits of precision and a scale of 1,000.
 /// (2^64/2-1)/1000 = 9,223,372,036,854,775.807
@@ -33,42 +33,6 @@ impl<T: PrimInt + FromPrimitive> From<f64> for Mills<T> {
         Mills::new(cents)
     }
 }
-
-// // impl<T: PrimInt + FromPrimitive + ToPrimitive> MoneyOps<Money<T>> for Money<T> {
-// //     fn parse_string(s: &str) -> T {
-// //         let mut integer_part = String::new();
-// //         let mut fractional_part = String::new();
-// //         let mut found_decimal = false;
-
-// //         for c in s.chars() {
-// //             if c.is_digit(10) {
-// //                 if found_decimal {
-// //                     fractional_part.push(c);
-// //                 } else {
-// //                     integer_part.push(c);
-// //                 }
-// //             } else if c == '.' {
-// //                 if found_decimal {
-// //                     // Ignore additional decimal points
-// //                     continue;
-// //                 }
-// //                 found_decimal = true;
-// //             }
-// //         }
-
-// //         // Ensure fractional part is exactly two digits
-// //         if fractional_part.len() == 1 {
-// //             fractional_part.push('0'); // Pad with zero if only one digit
-// //         } else if fractional_part.len() > 2 {
-// //             fractional_part.truncate(2); // Truncate to two digits
-// //         }
-
-// //         let integer_value: T = integer_part.parse().unwrap_or(0);
-// //         let fractional_value: T = fractional_part.parse().unwrap_or(0);
-
-// //         integer_value * 100 + fractional_value
-// //     }
-// // }
 
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Mills<T> {
     pub fn new(value: T) -> Self {
@@ -125,24 +89,6 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Div for Mills<T> {
         Mills(rounded / precision)
     }
 }
-
-// impl<T: PrimInt + FromPrimitive + ToPrimitive> Mul for Mills<T> {
-//     type Output = Self;
-//     fn mul(self, rhs: Self) -> Self::Output {
-//         let precision = T::from_u16(1_000).unwrap();
-//         let result = self.0 * rhs.0 / precision;
-//         Mills(result)
-//     }
-// }
-
-// impl<T: PrimInt + FromPrimitive + ToPrimitive> Div for Mills<T> {
-//     type Output = Self;
-//     fn div(self, rhs: Self) -> Self::Output {
-//         let precision = T::from_u16(1_000).unwrap();
-//         let result = self.0 * precision / rhs.0;
-//         Mills(result)
-//     }
-// }
 
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Rem for Mills<T> {
     type Output = Self;
