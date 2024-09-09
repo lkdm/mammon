@@ -110,7 +110,7 @@ where
 
         write!(
             f,
-            "{}${}.{:02}",
+            "{}{}.{:02}",
             sign,
             dollars.to_u64().unwrap_or(0),
             mills.to_u64().unwrap_or(0)
@@ -223,8 +223,10 @@ mod tests {
     #[test]
     fn test_display() {
         let m1 = Milli64::new(1_234);
-        assert_eq!(format!("{}", m1), "$1.23");
+        assert_eq!(format!("{}", m1), "1.23");
         let m2 = Milli64::new(-1_234);
-        assert_eq!(format!("{}", m2), "-$1.23");
+        assert_eq!(format!("{}", m2), "-1.23");
+        let m3 = Milli64::new(1_001);
+        assert_eq!(format!("{}", m3), "1.00");
     }
 }
