@@ -1,6 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
+use core::fmt;
 use core::ops::{Add, Deref, Div, Mul, Rem, Sub};
-use num_traits::{FromPrimitive, PrimInt, ToPrimitive};
+use num_traits::{FromPrimitive, PrimInt, Signed, ToPrimitive};
 
 /// Mills
 ///
@@ -43,11 +44,6 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Mills<T> {
     /// Create a new Mill
     ///
     /// Be careful to supply the correct value in Mills, as it is not automatically converted.
-    ///
-    /// ## Example
-    /// ```
-    /// use mills::Mills;
-    /// let value = Mills::new(1_005); // $1.005
     pub fn new(value: T) -> Self {
         Mills(value)
     }
@@ -72,6 +68,28 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Mills<T> {
         } else {
             value - remainder
         }
+    }
+}
+
+impl<T> fmt::Display for Mills<T>
+where
+    T: PrimInt + FromPrimitive + Div<Output = T> + Rem<Output = T> + Signed,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let thousand = T::from_u32(1_000).unwrap();
+        let abs_value = self.0.abs();
+        let dollars = abs_value / thousand;
+        let mills = abs_value % thousand;
+
+        let sign = if self.0.is_negative() { "-" } else { "" };
+
+        write!(
+            f,
+            "{}${}.{:03}",
+            sign,
+            dollars.to_u64().unwrap_or(0),
+            mills.to_u64().unwrap_or(0)
+        )
     }
 }
 
@@ -121,7 +139,6 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Rem for Mills<T> {
     }
 }
 
-
 /// Milli64
 /// A Milli wrapper around i64
 pub type Milli64 = Mills<i64>;
@@ -164,5 +181,13 @@ mod tests {
     fn test_from_cents() {
         let m1 = Milli64::from_cents(123);
         assert_eq!(m1, Milli64::new(1_230));
+    }
+
+    #[test]
+    fn test_display() {
+        let m1 = Milli64::new(1_234);
+        assert_eq!(format!("{}", m1), "$1.234");
+        let m2 = Milli64::new(-1_234);
+        assert_eq!(format!("{}", m2), "-$1.234");
     }
 }
