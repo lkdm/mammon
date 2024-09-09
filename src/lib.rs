@@ -39,6 +39,28 @@ impl<T: PrimInt + FromPrimitive> From<f64> for Mills<T> {
         Mills::new(cents)
     }
 }
+/// Round a mill value (thousandths) to a precision using half-even "banker's" rounding
+/// Returns the result in cents (hundredths)
+fn round_half_even<T>(inner_mills: T, precision: u32) -> T
+where
+    T: PrimInt + FromPrimitive + ToPrimitive,
+{
+    let ten = T::from_u32(10).unwrap();
+    let divisor = ten.pow(3 - precision.min(2));
+    let half = divisor / (T::from_u32(2).unwrap());
+    let remainder = inner_mills % divisor;
+
+    let rounded = if remainder > half
+        || (remainder == half && (inner_mills / divisor) % T::from_u32(2).unwrap() == T::one())
+    {
+        inner_mills + (divisor - remainder)
+    } else {
+        inner_mills - remainder
+    };
+
+    // Convert from mills to cents
+    rounded / ten
+}
 
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Mills<T> {
     /// Create a new Mill
@@ -80,12 +102,15 @@ where
         let abs_value = self.0.abs();
         let dollars = abs_value / thousand;
         let mills = abs_value % thousand;
+        let mills = round_half_even(mills, 2);
 
         let sign = if self.0.is_negative() { "-" } else { "" };
 
+        // TODO: banker's round the third decimal place
+
         write!(
             f,
-            "{}${}.{:03}",
+            "{}${}.{:02}",
             sign,
             dollars.to_u64().unwrap_or(0),
             mills.to_u64().unwrap_or(0)
@@ -184,10 +209,22 @@ mod tests {
     }
 
     #[test]
+    fn test_round_half_even() {
+        let m1 = Milli64::new(1_235); // 1.235
+        assert_eq!(round_half_even(*m1, 2), 1_24); // 1.24
+        let m2 = Milli64::new(1_234); // 1.234
+        assert_eq!(round_half_even(*m2, 2), 1_23); // 1.23
+        let m3 = Milli64::new(1_995); // 1.995
+        assert_eq!(round_half_even(*m3, 2), 2_00); // 2.00
+        let m4 = Milli64::new(1_001); // 1.001
+        assert_eq!(round_half_even(*m4, 2), 1_00); // 1.00
+    }
+
+    #[test]
     fn test_display() {
         let m1 = Milli64::new(1_234);
-        assert_eq!(format!("{}", m1), "$1.234");
+        assert_eq!(format!("{}", m1), "$1.23");
         let m2 = Milli64::new(-1_234);
-        assert_eq!(format!("{}", m2), "-$1.234");
+        assert_eq!(format!("{}", m2), "-$1.23");
     }
 }
