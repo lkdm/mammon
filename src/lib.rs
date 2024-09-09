@@ -4,8 +4,11 @@ use num_traits::{FromPrimitive, PrimInt, ToPrimitive};
 
 /// Mills
 ///
-/// A Mill is a fixed-point number with 64 bits of precision and a scale of 1,000.
-/// (2^64/2-1)/1000 = 9,223,372,036,854,775.807
+/// Mills is a newtype wrapper around a primitive integer type that represents a value.
+/// The value is stored in 1/1000th of the base unit– ie. 1/1000th of a dollar.
+///
+/// ## Usage
+/// You can use Mills to declare your own wrapper for a primitive integer type, or use the provided ones.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Mills<T: PrimInt + FromPrimitive + ToPrimitive>(T);
 
@@ -18,6 +21,7 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Deref for Mills<T> {
 }
 
 impl<T: PrimInt + FromPrimitive> From<f32> for Mills<T> {
+    /// Convert a f32 to Mills
     fn from(f: f32) -> Self {
         // Multiply by 100 and round to the nearest cent
         let rounded = (f * 1_000.0).round();
@@ -26,6 +30,7 @@ impl<T: PrimInt + FromPrimitive> From<f32> for Mills<T> {
     }
 }
 impl<T: PrimInt + FromPrimitive> From<f64> for Mills<T> {
+    /// Convert a f64 to Mills
     fn from(f: f64) -> Self {
         // Multiply by 100 and round to the nearest cent
         let rounded = (f * 1_000.0).round();
@@ -35,6 +40,14 @@ impl<T: PrimInt + FromPrimitive> From<f64> for Mills<T> {
 }
 
 impl<T: PrimInt + FromPrimitive + ToPrimitive> Mills<T> {
+    /// Create a new Mill
+    ///
+    /// Be careful to supply the correct value in Mills, as it is not automatically converted.
+    ///
+    /// ## Example
+    /// ```
+    /// use mills::Mills;
+    /// let value = Mills::new(1_005); // $1.005
     pub fn new(value: T) -> Self {
         Mills(value)
     }
@@ -46,6 +59,7 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Mills<T> {
     pub fn from_cents(cents: T) -> Self {
         Mills(cents * T::from_u16(10).unwrap())
     }
+
     fn round_bankers(value: T) -> T {
         let precision = T::from_u16(1_000).unwrap();
         let half = T::from_u16(500).unwrap();
@@ -107,9 +121,18 @@ impl<T: PrimInt + FromPrimitive + ToPrimitive> Rem for Mills<T> {
     }
 }
 
+
+/// Milli64
+/// A Milli wrapper around i64
 pub type Milli64 = Mills<i64>;
+/// Milliu64
+/// A Milli wrapper around u64
 pub type Millu64 = Mills<u64>;
+/// Milli128
+/// A Milli wrapper around i128
 pub type Milli128 = Mills<i128>;
+/// Milliu128
+/// A Milli wrapper around u128
 pub type Millu128 = Mills<u128>;
 
 #[cfg(test)]
